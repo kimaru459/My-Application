@@ -1,0 +1,43 @@
+<resources>
+    <string name="app_name">My Application</string>
+    <string name="action_settings">Settings</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+    <string name="signup">Sign Up</string>
+    <string name="signup2">Your account has been successfully created</string>
+    <string name="login">Log In</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="username">Username</string>
+    <string name="phonenumber">Phone Number</string>
+    <string name="phoneNo">Enter Phone Number</string>
+    <string name="otpNo">Enter the verification code</string>
+    <string name="buttonOtp">Go</string>
+    <string name="button">Next</string>
+    <string name="pay">Pay</string>
+    <string name="productName">Please choose a product</string>
+    <string name="sendMoney">Send Money</string>
+    <string name="save">Save</string>
+    <string name="invest">Invest</string>
+    <string name="borrow">Borrow</string>
+    <string name="check">Check</string>
+    <string name="SAccNumber">Sender Acc No.</string>
+    <string name="RAccNumber">Recipient Acc No</string>
+    <string name="price">Price</string>
+    <string name="proceed">Proceed</string>
+
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+
+    <string name="log_in">Log In</string>
+    <string name="are_you_a_new_member_register_now">Are you a new member? Register now</string>
+    <string name="name">Name</string>
+    <string name="phone">Phone</string>
+    <string name="Email">Email</string>
+
+
+</resources>
