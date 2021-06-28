@@ -1,8 +1,11 @@
 package com.example.myapplication;
 
 public class UserHelperClass {
-    String username, email, phonenumber, password;
+    String username, email, phonenumber, password,key;
 
+    public UserHelperClass() {
+
+    }
 
     public UserHelperClass(String username, String email, String phonenumber, String password) {
         this.username = username;
@@ -51,5 +54,13 @@ public class UserHelperClass {
     public void setPassword(String password) {
 
         this.password = password;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 }

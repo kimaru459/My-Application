@@ -1,22 +1,27 @@
 package com.example.myapplication;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.Patterns;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.navigation.fragment.NavHostFragment;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
+import java.util.List;
+
+import androidx.annotation.NonNull;
 
 
 public class LoginActivity extends Activity {
@@ -26,7 +31,13 @@ public class LoginActivity extends Activity {
     Button login;
     TextView register;
 
+    FirebaseDatabase rootNode;
+    DatabaseReference reference;
+    private ValueEventListener mDBListener;
 
+    private List<UserHelperClass> mUser;
+
+    private ProgressDialog progressDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,60 +53,51 @@ public class LoginActivity extends Activity {
         login = findViewById(R.id.login);
         register = findViewById(R.id.register);
 
+        rootNode = FirebaseDatabase.getInstance();
+        reference = rootNode.getReference("users");
 
+        progressDialog = new ProgressDialog(LoginActivity.this);
+        progressDialog.setMessage("Please wait...");
+        progressDialog.setIndeterminate(false);
+        progressDialog.setCancelable(false);
     }
     private void setupListeners(){
        login.setOnClickListener(v -> {
-           Intent ProductsActivity = new Intent(LoginActivity.this, ProductsActivity.class);
-           startActivity(ProductsActivity);
-           checkEmail();
-
+           if (checkEmail()){
+               loginUser();
+           }
        });
 
-            register.setOnClickListener(view -> {
-                Intent RegisterActivity = new Intent(LoginActivity.this, RegisterActivity.class);
-                startActivity(RegisterActivity);
+        register.setOnClickListener(view -> {
+            Intent RegisterActivity = new Intent(LoginActivity.this, RegisterActivity.class);
+            startActivity(RegisterActivity);
 
-            });
+        });
         }
 
-    void checkEmail(){
-        boolean isValid = true;
+    private boolean checkEmail(){
         if (isEmpty(email)) {
             email.setError("You must enter your email to login");
-            isValid = false;
         } else{
             if (!isEmail(email)){
                 email.setError("Enter valid email");
-                isValid = false;
             }
-        }
-        if (isEmpty(password)) {
-            password.setError("You must enter password to login!");
-            isValid = false;
-        } else {
-            if (password.getText().toString().length() < 4) {
-                password.setError("Password must be at least 4 chars long!");
-                isValid = false;
+            else {
+                if (isEmpty(password)) {
+                    password.setError("You must enter password to login!");
+                } else {
+                    if (password.getText().toString().length() < 4) {
+                        password.setError("Password must be at least 4 chars long!");
+                    }
+                    else {
+                        progressDialog.show();
+                        return true;
+                    }
+                }
             }
         }
 
-        //check email and password
-
-        if (isValid) {
-            String emailValue = email.getText().toString();
-            String passwordValue = password.getText().toString();
-            if (emailValue.equals("you@gmail.com") && passwordValue.equals("password1234")) {
-                //everything checked we open new activity
-                Intent i = new Intent(LoginActivity.this, RegisterActivity.class);
-                startActivity(i);
-                //we close this activity
-                this.finish();
-            } else {
-                Toast t = Toast.makeText(this, "Wrong email or password!", Toast.LENGTH_SHORT);
-                t.show();
-            }
-        }
+        return false;
     }
     boolean isEmail(EditText text) {
         CharSequence email = text.getText().toString();
@@ -107,9 +109,39 @@ public class LoginActivity extends Activity {
         return TextUtils.isEmpty(str);
     }
 
+    private void loginUser(){
+        final String currentUserEmail = email.getText().toString();
 
+        Query passwordVerification = reference.orderByChild("email").equalTo(currentUserEmail);
+        passwordVerification.addListenerForSingleValueEvent(
+                new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        String userPassword;
+                        for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
+                            userPassword = postSnapshot.child("password").getValue(String.class);
+                            Log.e("PostSnapshot.", "Value is: " + userPassword);
 
+                            assert userPassword != null;
+                            if (userPassword.equals(password.getText().toString())){
+                                startActivity(new Intent(LoginActivity.this,ProductsActivity.class));
+                                finish();
+                            }
+                            else {
+                                Toast.makeText(LoginActivity.this, "Invalid email/password", Toast.LENGTH_LONG).show();
+                            }
+                        }
+                        progressDialog.hide();
+                    }
 
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        Log.e("TAG", "Failed to read value.", databaseError.toException());
+                        progressDialog.hide();
+                    }
+                });
     }
+
+}
 
 
